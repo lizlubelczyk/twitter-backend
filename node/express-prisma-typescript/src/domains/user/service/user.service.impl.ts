@@ -21,4 +21,8 @@ export class UserServiceImpl implements UserService {
   async deleteUser (userId: any): Promise<void> {
     await this.repository.delete(userId)
   }
+
+  async switchPrivacy (userId: any): Promise<UserDTO> {
+    return await this.repository.switchPrivacy(userId)
+  }
 }

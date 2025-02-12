@@ -58,4 +58,44 @@ export class UserRepositoryImpl implements UserRepository {
     })
     return user ? new ExtendedUserDTO(user) : null
   }
+
+  async switchPrivacy (userId: string): Promise<UserDTO> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: userId
+      }
+    })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    const updatedUser = await this.db.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        private: !user.private
+      }
+    })
+
+    return new UserDTO(updatedUser)
+  }
+
+  async getFollowedUsersIds (userId: string): Promise<string[]> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: userId
+      },
+      include: {
+        follows: true
+      }
+    })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    return user.follows.map((follow: { followedId: string }) => follow.followedId)
+  }
 }

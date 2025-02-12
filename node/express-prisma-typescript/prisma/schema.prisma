@@ -31,6 +31,8 @@ model User {
   posts     Post[]
   follows   Follow[] @relation(name: "follows")
   followers Follow[] @relation(name: "followers")
+
+  private Boolean @default(false)
 }
 
 model Follow {
