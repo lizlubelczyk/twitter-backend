@@ -25,4 +25,8 @@ export class UserServiceImpl implements UserService {
   async switchPrivacy (userId: any): Promise<UserDTO> {
     return await this.repository.switchPrivacy(userId)
   }
+
+  async isPrivate (userId: any): Promise<boolean> {
+    return await this.repository.isPrivate(userId)
+  }
 }

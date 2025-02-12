@@ -98,4 +98,18 @@ export class UserRepositoryImpl implements UserRepository {
 
     return user.follows.map((follow: { followedId: string }) => follow.followedId)
   }
+
+  async isPrivate (userId: string): Promise<boolean> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: userId
+      }
+    })
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    return user.private
+  }
 }

@@ -9,11 +9,17 @@ import { PostRepositoryImpl } from '../repository'
 import { PostService, PostServiceImpl } from '../service'
 import { CreatePostInputDTO } from '../dto'
 import { UserRepositoryImpl } from '@domains/user/repository'
+import { FollowerRepositoryImpl } from '@domains/follower/repository'
+import { FollowerService, FollowerServiceImpl } from '@domains/follower/service'
+import { UserService, UserServiceImpl } from '@domains/user/service'
+
 
 export const postRouter = Router()
 
 // Use dependency injection
 const service: PostService = new PostServiceImpl(new PostRepositoryImpl(db), new UserRepositoryImpl(db))
+const followService: FollowerService = new FollowerServiceImpl(new FollowerRepositoryImpl(db))
+const userService: UserService = new UserServiceImpl(new UserRepositoryImpl(db))
 
 postRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
@@ -29,6 +35,13 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
   const { postId } = req.params
 
   const post = await service.getPost(userId, postId)
+  const posterId = post.authorId
+  const isFollowing = await followService.isFollowing(userId, posterId)
+  const isPrivate = await userService.isPrivate(posterId)
+
+  if (!(isFollowing) && isPrivate) {
+    return res.status(HttpStatus.NOT_FOUND).send('You are not following the author')
+  }
 
   return res.status(HttpStatus.OK).json(post)
 })
@@ -36,6 +49,12 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
 postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { userId: authorId } = req.params
+  const isFollowing = await followService.isFollowing(userId, authorId)
+  const isPrivate = await userService.isPrivate(authorId)
+
+  if (!(isFollowing) && isPrivate) {
+    return res.status(HttpStatus.NOT_FOUND).send('You are not following this user')
+  }
 
   const posts = await service.getPostsByAuthor(userId, authorId)
 
