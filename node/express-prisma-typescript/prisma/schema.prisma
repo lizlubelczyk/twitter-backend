@@ -66,6 +66,10 @@ model Post {
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // One to many
 
+  parentId String? @db.Uuid
+  parent   Post?   @relation("PostComments", fields: [parentId], references: [id])
+  comments Post[]  @relation("PostComments")
+
   Reaction Reaction[]
 }
 
