@@ -4,9 +4,10 @@ import { PostService } from '.'
 import { validate } from 'class-validator'
 import { ForbiddenException, NotFoundException } from '@utils'
 import { CursorPagination } from '@types'
+import { UserRepository } from '@domains/user/repository'
 
 export class PostServiceImpl implements PostService {
-  constructor (private readonly repository: PostRepository) {}
+  constructor (private readonly repository: PostRepository, private readonly userRepository: UserRepository) {}
 
   async createPost (userId: string, data: CreatePostInputDTO): Promise<PostDTO> {
     await validate(data)
@@ -28,8 +29,8 @@ export class PostServiceImpl implements PostService {
   }
 
   async getLatestPosts (userId: string, options: CursorPagination): Promise<PostDTO[]> {
-    // TODO: filter post search to return posts from authors that the user follows
-    return await this.repository.getAllByDatePaginated(options)
+    const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
+    return await this.repository.getAllByDatePaginatedAndFilter(options, followedUserIds)
   }
 
   async getPostsByAuthor (userId: any, authorId: string): Promise<PostDTO[]> {
