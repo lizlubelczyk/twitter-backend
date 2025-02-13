@@ -66,4 +66,13 @@ export class PostRepositoryImpl implements PostRepository {
     })
     return posts.map(post => new PostDTO(post))
   }
+
+  async getByIds (postIds: string[]): Promise<PostDTO[]> {
+    const posts = await this.db.post.findMany({
+      where: {
+        id: { in: postIds }
+      }
+    })
+    return posts.map(post => new PostDTO(post))
+  }
 }

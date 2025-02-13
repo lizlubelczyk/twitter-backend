@@ -2,10 +2,11 @@ import { Router } from 'express'
 import { ReactionService, ReactionServiceImpl } from '@domains/reaction/service'
 import { ReactionRepositoryImpl } from '@domains/reaction/repository'
 import { db } from '@utils'
+import { PostRepositoryImpl } from '@domains/post/repository'
 
 export const reactionRouter = Router()
 
-const service: ReactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db))
+const service: ReactionService = new ReactionServiceImpl(new ReactionRepositoryImpl(db), new PostRepositoryImpl(db))
 
 reactionRouter.post('/:type/:postId', async (req, res) => {
   const { userId } = res.locals.context
@@ -29,4 +30,12 @@ reactionRouter.delete('/:type/:postId', async (req, res) => {
   }
   await service.deleteReaction(userId, postId, type)
   res.sendStatus(200)
+})
+
+reactionRouter.get('/:type', async (req, res) => {
+  const { userId } = res.locals.context
+  const { type } = req.params
+  const { limit, after } = req.query
+  const posts = await service.getByUserIdAndType(userId, type, limit ? Number(limit) : undefined, after ? after.toString() : undefined)
+  res.json(posts)
 })

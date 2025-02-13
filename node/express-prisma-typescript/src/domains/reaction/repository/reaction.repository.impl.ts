@@ -38,4 +38,22 @@ export class ReactionRepositoryImpl implements ReactionRepository {
     })
     return reaction != null
   }
+
+  async getByUserIdAndType (userId: string, type: string, limit? : number, after? : string): Promise<string[]> {
+    const reactions = await this.db.reaction.findMany({
+      where: {
+        userId,
+        type
+      },
+      take: limit,
+      skip: after ? 1 : 0,
+      cursor: after ? {
+        id: after
+      } : undefined,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+    return reactions.map(reaction => reaction.postId)
+  }
 }
