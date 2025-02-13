@@ -21,4 +21,9 @@ export class CommentServiceImpl implements CommentService {
   async isComment (commentId: string): Promise<boolean> {
     return await this.commentRepository.isComment(commentId)
   }
+
+  async getByUserId (userId: string, limit?: number, after?: string): Promise<CommentDTO[]> {
+    const comments = await this.commentRepository.getByUserId(userId, limit, after)
+    return comments
+  }
 }
