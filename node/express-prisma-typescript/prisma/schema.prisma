@@ -33,6 +33,8 @@ model User {
   followers Follow[] @relation(name: "followers")
 
   private Boolean @default(false)
+
+  Reaction Reaction[]
 }
 
 model Follow {
@@ -63,4 +65,26 @@ model Post {
   deletedAt DateTime? // Optional value
 
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade) // One to many
+
+  Reaction Reaction[]
+}
+
+model Reaction {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid // Primary Key
+
+  userId String @db.Uuid()
+  postId String @db.Uuid()
+  type   String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // One to many
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade) // One to many
+
+  @@unique([userId, postId, type])
+}
+
+enum ReactionType {
+  LIKE
+  RETWEET
 }

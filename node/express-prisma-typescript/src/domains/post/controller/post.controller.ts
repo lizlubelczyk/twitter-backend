@@ -13,7 +13,6 @@ import { FollowerRepositoryImpl } from '@domains/follower/repository'
 import { FollowerService, FollowerServiceImpl } from '@domains/follower/service'
 import { UserService, UserServiceImpl } from '@domains/user/service'
 
-
 export const postRouter = Router()
 
 // Use dependency injection
