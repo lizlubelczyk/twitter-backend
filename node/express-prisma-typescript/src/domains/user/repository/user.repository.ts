@@ -11,4 +11,5 @@ export interface UserRepository {
   switchPrivacy: (userId: string) => Promise<UserDTO>
   getFollowedUsersIds: (userId: string) => Promise<string[]>
   isPrivate: (userId: string) => Promise<boolean>
+  getByIdExtended: (userId: string) => Promise<ExtendedUserDTO>
 }

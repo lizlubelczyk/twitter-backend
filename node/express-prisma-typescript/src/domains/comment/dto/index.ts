@@ -15,7 +15,7 @@ export class CommentDTO {
   content: string
   images: string[]
   createdAt: Date
-  parentId: string|null
+  parentId: string | null
 }
 
 export class CreateCommentInputDTO {

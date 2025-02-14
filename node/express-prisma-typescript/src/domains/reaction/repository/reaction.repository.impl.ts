@@ -39,7 +39,7 @@ export class ReactionRepositoryImpl implements ReactionRepository {
     return reaction != null
   }
 
-  async getByUserIdAndType (userId: string, type: string, limit? : number, after? : string): Promise<string[]> {
+  async getByUserIdAndType (userId: string, type: string, limit?: number, after?: string): Promise<string[]> {
     const reactions = await this.db.reaction.findMany({
       where: {
         userId,
@@ -47,13 +47,24 @@ export class ReactionRepositoryImpl implements ReactionRepository {
       },
       take: limit,
       skip: after ? 1 : 0,
-      cursor: after ? {
-        id: after
-      } : undefined,
+      cursor: after
+        ? {
+            id: after
+          }
+        : undefined,
       orderBy: {
         createdAt: 'desc'
       }
     })
     return reactions.map(reaction => reaction.postId)
+  }
+
+  async countByPostIdAndType (postId: string, type: string, limit?: number, after?: string): Promise<number> {
+    return await this.db.reaction.count({
+      where: {
+        postId,
+        type
+      }
+    })
   }
 }
