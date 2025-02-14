@@ -31,9 +31,11 @@ export class CommentRepositoryImpl implements CommentRepository {
       },
       take: limit,
       skip: after ? 1 : 0,
-      cursor: after ? {
-        id: after
-      } : undefined,
+      cursor: after
+        ? {
+            id: after
+          }
+        : undefined,
       orderBy: {
         createdAt: 'desc'
       }
@@ -56,13 +58,23 @@ export class CommentRepositoryImpl implements CommentRepository {
       },
       take: limit,
       skip: after ? 1 : 0,
-      cursor: after ? {
-        id: after
-      } : undefined,
+      cursor: after
+        ? {
+            id: after
+          }
+        : undefined,
       orderBy: {
         createdAt: 'desc'
       }
     })
     return comments.map(comment => new CommentDTO(comment))
+  }
+
+  async countByPostId (postId: string): Promise<number> {
+    return await this.db.post.count({
+      where: {
+        parentId: postId
+      }
+    })
   }
 }

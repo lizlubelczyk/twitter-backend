@@ -28,5 +28,4 @@ export class ReactionServiceImpl implements ReactionService {
     const postIds = await this.reactionRepository.getByUserIdAndType(userId, type, limit, after)
     return await this.postRepository.getByIds(postIds)
   }
-
 }

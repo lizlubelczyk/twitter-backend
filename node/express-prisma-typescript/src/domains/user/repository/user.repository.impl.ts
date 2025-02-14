@@ -112,4 +112,16 @@ export class UserRepositoryImpl implements UserRepository {
 
     return user.private
   }
+
+  async getByIdExtended (userId: string): Promise<ExtendedUserDTO> {
+    const user = await this.db.user.findUnique({
+      where: {
+        id: userId
+      }
+    })
+    if (!user) {
+      throw new Error('User not found')
+    }
+    return new ExtendedUserDTO(user)
+  }
 }

@@ -30,8 +30,8 @@ export class FollowerRepositoryImpl implements FollowerRepository {
     const follow = await this.db.follow.findUnique({
       where: {
         followerId_followedId: {
-          followerId: followerId,
-          followedId: followedId
+          followerId,
+          followedId
         } as any
       }
     })
