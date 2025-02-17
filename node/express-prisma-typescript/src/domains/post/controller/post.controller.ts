@@ -14,14 +14,13 @@ import { FollowerService, FollowerServiceImpl } from '@domains/follower/service'
 import { UserService, UserServiceImpl } from '@domains/user/service'
 import { CommentRepositoryImpl } from '@domains/comment/repository'
 import { ReactionRepositoryImpl } from '@domains/reaction/repository'
-import { generateUploadUrl } from '@domains/user/utils/s3Service'
 
 export const postRouter = Router()
 
 // Use dependency injection
 const service: PostService = new PostServiceImpl(new PostRepositoryImpl(db), new UserRepositoryImpl(db), new ReactionRepositoryImpl(db), new CommentRepositoryImpl(db))
 const followService: FollowerService = new FollowerServiceImpl(new FollowerRepositoryImpl(db))
-const userService: UserService = new UserServiceImpl(new UserRepositoryImpl(db))
+const userService: UserService = new UserServiceImpl(new UserRepositoryImpl(db), new FollowerRepositoryImpl(db))
 
 postRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context

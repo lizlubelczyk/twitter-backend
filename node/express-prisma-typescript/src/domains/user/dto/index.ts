@@ -33,7 +33,7 @@ export class UserViewDTO {
   }
 
   id: string
-  name: string
+  name: string | null
   username: string
   profilePicture: string | null
 }
