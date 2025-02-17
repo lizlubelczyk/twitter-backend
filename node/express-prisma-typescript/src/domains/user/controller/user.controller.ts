@@ -7,6 +7,7 @@ import { db } from '@utils'
 
 import { UserRepositoryImpl } from '../repository'
 import { UserService, UserServiceImpl } from '../service'
+import { generateUploadUrl } from '@domains/user/utils/s3Service'
 
 export const userRouter = Router()
 
@@ -30,7 +31,7 @@ userRouter.get('/me', async (req: Request, res: Response) => {
   return res.status(HttpStatus.OK).json(user)
 })
 
-userRouter.get('/:userId', async (req: Request, res: Response) => {
+userRouter.get('/getById/:userId', async (req: Request, res: Response) => {
   const { userId: otherUserId } = req.params
 
   const user = await service.getUser(otherUserId)
@@ -48,8 +49,21 @@ userRouter.delete('/', async (req: Request, res: Response) => {
 
 userRouter.put('/privacy', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-
+  console.log('userId', userId)
   const user = await service.switchPrivacy(userId)
 
   return res.status(HttpStatus.OK).json(user)
+})
+
+userRouter.get('/profile_picture', async (req: Request, res: Response) => {
+  const { userId } = res.locals.context
+  console.log('userId', userId)
+  try {
+    const { uploadUrl, fileUrl } = await generateUploadUrl(userId)
+    await service.setProfilePicture(userId, fileUrl)
+    return res.status(HttpStatus.OK).json({ uploadUrl })
+  } catch (e) {
+    const err = e as Error
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: err.message })
+  }
 })
