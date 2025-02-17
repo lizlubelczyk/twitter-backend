@@ -12,4 +12,5 @@ export interface UserRepository {
   getFollowedUsersIds: (userId: string) => Promise<string[]>
   isPrivate: (userId: string) => Promise<boolean>
   getByIdExtended: (userId: string) => Promise<ExtendedUserDTO>
+  setProfilePicture: (userId: string, pictureUrl: string) => Promise<UserDTO>
 }

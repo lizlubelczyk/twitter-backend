@@ -29,4 +29,9 @@ export class UserServiceImpl implements UserService {
   async isPrivate (userId: any): Promise<boolean> {
     return await this.repository.isPrivate(userId)
   }
+
+  async setProfilePicture (userId: string, pictureUrl: string): Promise<UserDTO> {
+    console.log('userId', userId)
+    return await this.repository.setProfilePicture(userId, pictureUrl)
+  }
 }

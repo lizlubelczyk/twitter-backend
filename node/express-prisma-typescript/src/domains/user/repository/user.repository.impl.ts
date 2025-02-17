@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { OffsetPagination } from '@types'
 import { ExtendedUserDTO, UserDTO } from '../dto'
 import { UserRepository } from './user.repository'
+import { isUUID } from 'class-validator'
 
 export class UserRepositoryImpl implements UserRepository {
   constructor (private readonly db: PrismaClient) {}
@@ -13,7 +14,11 @@ export class UserRepositoryImpl implements UserRepository {
     }).then(user => new UserDTO(user))
   }
 
-  async getById (userId: any): Promise<UserDTO | null> {
+  async getById (userId: string): Promise<UserDTO | null> {
+    console.log('getById')
+    if (!isUUID(userId)) {
+      return null
+    }
     const user = await this.db.user.findUnique({
       where: {
         id: userId
@@ -123,5 +128,18 @@ export class UserRepositoryImpl implements UserRepository {
       throw new Error('User not found')
     }
     return new ExtendedUserDTO(user)
+  }
+
+  async setProfilePicture (userId: string, pictureUrl: string): Promise<UserDTO> {
+    console.log('userId', userId)
+    const user = await this.db.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        profilePicture: pictureUrl
+      }
+    })
+    return new UserDTO(user)
   }
 }
