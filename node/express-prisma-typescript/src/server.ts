@@ -5,8 +5,14 @@ import express from 'express'
 import { Constants, NodeEnv, Logger } from '@utils'
 import { router } from '@router'
 import { ErrorHandling } from '@utils/errors'
+import { createServer } from 'http'
+import { setupIO } from '@utils/socketIO'
+import swaggerJsdoc from 'swagger-jsdoc'
+import swaggerUi from 'swagger-ui-express'
+import swaggerConfig from './swaggerConfig'
 
 const app = express()
+const server = createServer(app)
 
 // Set up request logger
 if (Constants.NODE_ENV === NodeEnv.DEV) {
@@ -29,6 +35,12 @@ app.use('/api', router)
 
 app.use(ErrorHandling)
 
-app.listen(Constants.PORT, () => {
+setupIO(server)
+
+// Swagger setup
+const specs = swaggerJsdoc(swaggerConfig)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
+
+server.listen(Constants.PORT, () => {
   Logger.info(`Server listening on port ${Constants.PORT}`)
 })
