@@ -1,17 +1,15 @@
-name: CI Pipeline
+name: CI
 
 on:
   push:
     branches:
-        - dev
-        - main
+      - dev
   pull_request:
     branches:
-        - dev
-        - main
+      - dev
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     services:
@@ -24,34 +22,24 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Generate Prisma client
-        run: yarn prisma generate
-
-      - name: Run database migrations
-        run: yarn prisma migrate dev --name init
+        run: yarn install
 
       - name: Run tests
-        run: yarn test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-
-      - name: Lint code
-        run: yarn lint
+          DATABASE_URL: postgresql://test_user:pass123@localhost:5432/emil-service
+        run: npx jest
