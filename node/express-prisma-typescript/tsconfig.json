@@ -22,7 +22,9 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@*": ["./*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "resolveJsonModule": true
   },
   "lib": ["es2022"],
   "include": ["src/**/*"],

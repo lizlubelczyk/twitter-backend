@@ -1,12 +1,20 @@
-import { CreatePostInputDTO, PostDTO } from '../dto'
+import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
 import { validate } from 'class-validator'
-import { ForbiddenException, NotFoundException } from '@utils'
 import { CursorPagination } from '@types'
+import { UserRepository } from '../../user/repository'
+import { ReactionRepository } from '../../reaction/repository'
+import { CommentRepository } from '../../comment/repository'
+import { ForbiddenException, NotFoundException } from '../../../utils'
 
 export class PostServiceImpl implements PostService {
-  constructor (private readonly repository: PostRepository) {}
+  constructor (
+    private readonly repository: PostRepository,
+    private readonly userRepository: UserRepository,
+    private readonly reactionRepository: ReactionRepository,
+    private readonly commentRepository: CommentRepository
+  ) {}
 
   async createPost (userId: string, data: CreatePostInputDTO): Promise<PostDTO> {
     await validate(data)
@@ -20,20 +28,51 @@ export class PostServiceImpl implements PostService {
     await this.repository.delete(postId)
   }
 
-  async getPost (userId: string, postId: string): Promise<PostDTO> {
-    // TODO: validate that the author has public profile or the user follows the author
+  async getPost (userId: string, postId: string): Promise<ExtendedPostDTO> {
     const post = await this.repository.getById(postId)
     if (!post) throw new NotFoundException('post')
-    return post
+
+    const [likeCount, retweetCount, commentCount, author] = await Promise.all([
+      this.reactionRepository.countByPostIdAndType(postId, 'like'),
+      this.reactionRepository.countByPostIdAndType(postId, 'retweet'),
+      this.commentRepository.countByPostId(postId),
+      this.userRepository.getByIdExtended(post.authorId)
+    ])
+
+    return {
+      ...post,
+      qtyComments: commentCount,
+      qtyLikes: likeCount,
+      qtyRetweets: retweetCount,
+      author
+    }
   }
 
   async getLatestPosts (userId: string, options: CursorPagination): Promise<PostDTO[]> {
-    // TODO: filter post search to return posts from authors that the user follows
-    return await this.repository.getAllByDatePaginated(options)
+    const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
+    return await this.repository.getAllByDatePaginatedAndFilter(options, followedUserIds)
   }
 
-  async getPostsByAuthor (userId: any, authorId: string): Promise<PostDTO[]> {
-    // TODO: throw exception when the author has a private profile and the user doesn't follow them
-    return await this.repository.getByAuthorId(authorId)
+  async getPostsByAuthor (userId: string, authorId: string): Promise<ExtendedPostDTO[]> {
+    const posts = await this.repository.getByAuthorId(authorId)
+
+    return await Promise.all(
+      posts.map(async (post) => {
+        const [likeCount, retweetCount, commentCount, author] = await Promise.all([
+          this.reactionRepository.countByPostIdAndType(post.id, 'like'),
+          this.reactionRepository.countByPostIdAndType(post.id, 'retweet'),
+          this.commentRepository.countByPostId(post.id),
+          this.userRepository.getByIdExtended(post.authorId)
+        ])
+
+        return {
+          ...post,
+          qtyComments: commentCount,
+          qtyLikes: likeCount,
+          qtyRetweets: retweetCount,
+          author
+        }
+      })
+    )
   }
 }
