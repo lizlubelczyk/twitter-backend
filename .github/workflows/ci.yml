@@ -42,4 +42,4 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql://test_user:pass123@localhost:5432/emil-service
-        run: npx jest
+        run: yarn test
