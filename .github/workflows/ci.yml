@@ -38,8 +38,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+        working-directory: /Users/lizlubelczyk/Documents/Sirius/twitter-backend/node/express-prisma-typescript
 
       - name: Run tests
         env:
           DATABASE_URL: postgresql://test_user:pass123@localhost:5432/emil-service
-        run: yarn test
+        run: yyarn --cwd /Users/lizlubelczyk/Documents/Sirius/twitter-backend/node/express-prisma-typescript jest
