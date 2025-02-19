@@ -1,6 +1,6 @@
-import { FollowerRepository } from '@domains/follower/repository'
-import { FollowerService } from '@domains/follower/service/follower.service'
-import { FollowDTO } from '@domains/follower/dto'
+import { FollowerRepository } from '../repository'
+import { FollowerService } from '../service/follower.service'
+import { FollowDTO } from '../dto'
 
 export class FollowerServiceImpl implements FollowerService {
   constructor (private readonly followerRepository: FollowerRepository) {}

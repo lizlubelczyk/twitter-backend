@@ -1,9 +1,9 @@
-import { NotFoundException } from '@utils/errors'
+import { NotFoundException } from '../../../utils/errors'
 import { OffsetPagination } from 'types'
 import { UserDTO, UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
-import { FollowerRepository } from '@domains/follower/repository'
+import { FollowerRepository } from '../../follower/repository'
 
 export class UserServiceImpl implements UserService {
   constructor (private readonly repository: UserRepository, private readonly followerRepository: FollowerRepository) {}
@@ -14,7 +14,7 @@ export class UserServiceImpl implements UserService {
     return user
   }
 
-  async getUserRecommendations(userId: any, options: OffsetPagination): Promise<UserViewDTO[]> {
+  async getUserRecommendations (userId: any, options: OffsetPagination): Promise<UserViewDTO[]> {
     const followedUsersIds = await this.followerRepository.getFollowedUsersIds(userId)
     if (followedUsersIds === null || followedUsersIds.length === 0) {
       return []

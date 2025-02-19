@@ -1,6 +1,6 @@
 import { CommentDTO, CreateCommentInputDTO } from '../dto'
 import { PrismaClient } from '@prisma/client'
-import { CommentRepository } from '@domains/comment/repository/comment.repository'
+import { CommentRepository } from './comment.repository'
 
 export class CommentRepositoryImpl implements CommentRepository {
   constructor (private readonly db: PrismaClient) {}
