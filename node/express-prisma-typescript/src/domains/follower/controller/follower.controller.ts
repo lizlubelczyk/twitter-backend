@@ -53,6 +53,9 @@ followerRouter.post('/follow/:followedId', async (req: Request, res: Response) =
   const { followedId } = req.params
   const { userId } = res.locals.context
   const isFollowing = await service.isFollowing(userId, followedId)
+  if (userId === followedId) {
+    return res.status(400).json({ error: 'Cannot follow yourself' })
+  }
   if (isFollowing) {
     return res.status(400).json({ error: 'Already following' })
   }
