@@ -22,67 +22,65 @@ export const setupIO = (server: httpServer): void => {
   io.use(authenticateSocket)
 
   io.on('connection', (socket) => {
-    console.log('a user connected')
+    const userId = socket.data.user
+    console.log('a user connected:', userId)
 
     socket.on('join room', async ({ receiverId }: { receiverId: string }) => {
-      const senderId = socket.data.user // Extract senderId from authentication
-      console.log('join room', senderId, receiverId)
-      if (!senderId || !receiverId) {
+      console.log('join room', userId, receiverId)
+      if (!userId || !receiverId) {
         console.error('Missing sender or receiver ID')
         return
       }
 
-      const room = [senderId, receiverId].sort().join('_')
+      const room = [userId, receiverId].sort().join('_')
       await socket.join(room)
 
       if (socket.rooms.has(room)) {
-        console.log(`User ${senderId} successfully joined room ${room}`)
+        console.log(`User ${userId} successfully joined room ${room}`)
       } else {
-        console.error(`User ${senderId} failed to join room ${room}`)
+        console.error(`User ${userId} failed to join room ${room}`)
       }
     })
 
     socket.on('leave room', async (receiverId: string) => {
-      const senderId = socket.data.user
-      const room = [senderId, receiverId].sort().join('_')
+      const room = [userId, receiverId].sort().join('_')
       await socket.leave(room)
     })
 
     socket.on('chat message', async ({ msg, receiverId }: { msg: string, receiverId: string }) => {
-      const senderId = socket.data.user // Extract senderId from authentication
-      console.log('senderId:', senderId, 'receiverId:', receiverId)
+      console.log('senderId:', userId, 'receiverId:', receiverId)
       console.log('message:', msg)
 
-      if (!senderId || !receiverId || !msg) {
+      if (!userId || !receiverId || !msg) {
         console.error('Missing senderId, receiverId, or message')
         return
       }
 
-      const room = [senderId, receiverId].sort().join('_')
+      const room = [userId, receiverId].sort().join('_')
       const roomData = io.sockets.adapter.rooms.get(room)
 
       if (!roomData?.has(socket.id)) {
-        console.error(`User ${senderId} is not in room ${room}, message rejected.`)
+        console.error(`User ${userId} is not in room ${room}, message rejected.`)
         return
       }
 
-      if (await followerService.isFollowing(senderId, receiverId) && await followerService.isFollowing(receiverId, senderId)) {
+      if (await followerService.isFollowing(userId, receiverId) && await followerService.isFollowing(receiverId, userId)) {
         try {
-          const message = await chatService.saveMessage(senderId, receiverId, msg)
+          const message = await chatService.saveMessage(userId, receiverId, msg)
           io.to(room).emit('chat message', msg, message.createdAt)
         } catch (e) {
           console.error('Error saving message:', e)
           throw new ConflictException()
         }
       } else {
-        console.error(`User ${senderId} and ${receiverId} are not following each other.`)
+        console.error(`User ${userId} and ${receiverId} are not following each other.`)
       }
     })
 
-    socket.on('bring room', async ({ senderId, receiverId }: { senderId: string, receiverId: string }) => {
-      console.log('bring room', senderId, receiverId)
-      const room = [senderId, receiverId].sort().join('_')
-      const messages = await chatService.getMessages(senderId, receiverId)
+    socket.on('bring room', async ({ receiverId }: { receiverId: string }) => {
+      console.log('bring room', userId, receiverId)
+      const room = [userId, receiverId].sort().join('_')
+      const messages = await chatService.getMessages(userId, receiverId)
       messages.map(msg => io.to(room).emit('chat message', msg.content, msg.createdAt))
       console.log(messages)
     })
