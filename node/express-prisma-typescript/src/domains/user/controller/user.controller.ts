@@ -202,4 +202,30 @@ userRouter.get('/by_username/:username', async (req: Request, res: Response) => 
   return res.status(HttpStatus.OK).json(users)
 })
 
+/**
+ * @swagger
+ * /users/profile/{userId}:
+ *   get:
+ *     summary: Get a user's profile by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the user to retrieve
+ *     responses:
+ *       200:
+ *         description: Returns the user's profile details
+ *       404:
+ *         description: User not found
+ */
+
+userRouter.get('/profile/:userId', async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const user = await service.getProfile(userId)
+  return res.status(HttpStatus.OK).json(user)
+})
+
 export default userRouter

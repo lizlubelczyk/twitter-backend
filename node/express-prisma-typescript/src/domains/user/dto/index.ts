@@ -30,10 +30,40 @@ export class UserViewDTO {
     this.name = user.name
     this.username = user.username
     this.profilePicture = user.profilePicture
+    this.private = user.private
   }
 
   id: string
   name: string | null
   username: string
   profilePicture: string | null
+  private: boolean
+}
+
+export class UserProfileDTO {
+  constructor (
+    id: string,
+    name: string | null | undefined,
+    username: string | undefined,
+    profilePicture: string | null | undefined,
+    isPrivate: false | true | undefined,
+    followers: string[],
+    following: string[]
+  ) {
+    this.id = id
+    this.name = name
+    this.username = username
+    this.profilePicture = profilePicture
+    this.private = isPrivate
+    this.followers = followers
+    this.following = following
+  }
+
+  id: string
+  name: string | null | undefined
+  username: string | undefined
+  profilePicture: string | null | undefined
+  private: false | true | undefined
+  followers: string[]
+  following: string[]
 }
