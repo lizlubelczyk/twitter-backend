@@ -120,7 +120,7 @@ describe('PostServiceImpl', () => {
       mockCommentRepository.countByPostId.mockResolvedValueOnce(commentCount)
       mockUserRepository.getByIdExtended.mockResolvedValueOnce(author)
 
-      const result = await postService.getPost(userId, postId)
+      const result = await postService.getPost(postId)
 
       expect(result).toEqual(post)
       expect(mockPostRepository.getById).toHaveBeenCalledWith(postId)
@@ -130,7 +130,7 @@ describe('PostServiceImpl', () => {
       const postId = 'post1'
       mockPostRepository.getById.mockResolvedValueOnce(null)
 
-      await expect(postService.getPost('user1', postId)).rejects.toThrow(NotFoundException)
+      await expect(postService.getPost(postId)).rejects.toThrow(NotFoundException)
     })
   })
 
