@@ -7,4 +7,5 @@ export interface CommentRepository {
   isComment: (commentId: string) => Promise<boolean>
   getByUserId: (userId: string, limit?: number, after?: string) => Promise<CommentDTO[]>
   countByPostId: (postId: string) => Promise<number>
+  isAuthor: (userId: string, commentId: string) => Promise<boolean>
 }

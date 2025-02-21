@@ -1,6 +1,6 @@
 import { NotFoundException } from '../../../utils/errors'
 import { OffsetPagination } from 'types'
-import { UserDTO, UserViewDTO } from '../dto'
+import { UserDTO, UserProfileDTO, UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
 import { FollowerRepository } from '../../follower/repository'
@@ -24,10 +24,16 @@ export class UserServiceImpl implements UserService {
       followedUsersIds.map(async id => await this.followerRepository.getFollowedUsersIds(id))
     )
     const recommendedUsersIds = followedByFollowedUsersIds.flat()
-    const uniqueRecommendedUsersIds = recommendedUsersIds.filter(id => !followedUsersIds.includes(id))
+    const uniqueRecommendedUsersIds = recommendedUsersIds.filter(id => !followedUsersIds.includes(id) && id !== userId)
+
+    const skip = options.skip ?? 0
+    const limit = options.limit ?? 10
+
+    const paginatedRecommendedUsersIds = uniqueRecommendedUsersIds.slice(skip, skip + limit)
     const recommendedUsers = await Promise.all(
-      uniqueRecommendedUsersIds.map(async id => await this.repository.getById(id))
+      paginatedRecommendedUsersIds.map(async id => await this.repository.getById(id))
     )
+
     return recommendedUsers.filter((user): user is UserViewDTO => user !== null).map(user => new UserViewDTO(user))
   }
 
@@ -50,5 +56,12 @@ export class UserServiceImpl implements UserService {
 
   async getUsersByUsername (usernames: string, options: OffsetPagination): Promise<UserViewDTO[]> {
     return await this.repository.getUsersByUsername(usernames, options)
+  }
+
+  async getProfile (userId: any): Promise<UserProfileDTO> {
+    const user = await this.repository.getById(userId)
+    const followedUsersIds = await this.followerRepository.getFollowedUsersIds(userId)
+    const followersIds = await this.followerRepository.getFollowersIds(userId)
+    return new UserProfileDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds)
   }
 }

@@ -5,4 +5,5 @@ export interface FollowerRepository {
   delete: (userId: string, followedId: string) => Promise<void>
   isFollowing: (userId: string, followedId: string) => Promise<boolean>
   getFollowedUsersIds: (userId: string) => Promise<string[]>
+  getFollowersIds: (userId: string) => Promise<string[]>
 }

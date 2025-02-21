@@ -6,14 +6,16 @@ import { Message } from '@prisma/client'
 const mockRepository = {
   saveMessage: jest.fn(),
   getMessages: jest.fn(),
-  deleteMessage: jest.fn()
+  deleteMessage: jest.fn(),
+  isSender: jest.fn()
 }
 
 // Create an instance of ChatService with the mocked repository
 const chatService: ChatService = {
   saveMessage: mockRepository.saveMessage,
   getMessages: mockRepository.getMessages,
-  deleteMessage: mockRepository.deleteMessage
+  deleteMessage: mockRepository.deleteMessage,
+  isSender: mockRepository.isSender
 }
 
 describe('ChatService', () => {

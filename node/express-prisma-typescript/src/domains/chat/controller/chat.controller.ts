@@ -91,6 +91,10 @@ chatRouter.get('/:userId', async (req: Request, res: Response) => {
  */
 chatRouter.delete('/:messageId', async (req: Request, res: Response) => {
   const { messageId } = req.params
+  const isSender = await chatService.isSender(res.locals.context.userId, messageId)
+  if (!isSender) {
+    return res.sendStatus(HttpStatus.UNAUTHORIZED)
+  }
   await chatService.deleteMessage(messageId)
   return res.sendStatus(HttpStatus.NO_CONTENT)
 })

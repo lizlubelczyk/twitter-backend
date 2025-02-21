@@ -14,4 +14,8 @@ export class ChatServiceImpl {
   async deleteMessage (messageId: string): Promise<Message> {
     return await this.chatRepository.deleteMessage(messageId)
   }
+
+  async isSender (userId: string, messageId: string): Promise<boolean> {
+    return await this.chatRepository.isSender(userId, messageId)
+  }
 }

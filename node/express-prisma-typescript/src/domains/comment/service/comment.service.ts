@@ -6,4 +6,5 @@ export interface CommentService {
   getByPostId: (postId: string, limit?: number, after?: string) => Promise<CommentDTO[]>
   isComment: (commentId: string) => Promise<boolean>
   getByUserId: (userId: string, limit?: number, after?: string) => Promise<CommentDTO[]>
+  isAuthor: (userId: string, commentId: string) => Promise<boolean>
 }
