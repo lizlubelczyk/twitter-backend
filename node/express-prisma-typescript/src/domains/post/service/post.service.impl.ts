@@ -28,7 +28,7 @@ export class PostServiceImpl implements PostService {
     await this.repository.delete(postId)
   }
 
-  async getPost (userId: string, postId: string): Promise<ExtendedPostDTO> {
+  async getPost (postId: string): Promise<ExtendedPostDTO> {
     const post = await this.repository.getById(postId)
     if (!post) throw new NotFoundException('post')
 

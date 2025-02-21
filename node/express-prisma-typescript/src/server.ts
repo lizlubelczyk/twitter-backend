@@ -44,3 +44,5 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 server.listen(Constants.PORT, () => {
   Logger.info(`Server listening on port ${Constants.PORT}`)
 })
+
+export default server

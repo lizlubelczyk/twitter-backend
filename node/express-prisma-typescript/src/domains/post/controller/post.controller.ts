@@ -87,7 +87,7 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { postId } = req.params
 
-  const post = await service.getPost(userId, postId)
+  const post = await service.getPost(postId)
   const posterId = post.authorId
   const isFollowing = await followService.isFollowing(userId, posterId)
   const isPrivate = await userService.isPrivate(posterId)

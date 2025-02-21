@@ -77,4 +77,13 @@ export class CommentRepositoryImpl implements CommentRepository {
       }
     })
   }
+
+  async isAuthor (userId: string, commentId: string): Promise<boolean> {
+    const comment = await this.db.post.findUnique({
+      where: {
+        id: commentId
+      }
+    })
+    return comment?.authorId === userId
+  }
 }

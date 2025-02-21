@@ -26,4 +26,8 @@ export class CommentServiceImpl implements CommentService {
     const comments = await this.commentRepository.getByUserId(userId, limit, after)
     return comments
   }
+
+  async isAuthor (userId: string, commentId: string): Promise<boolean> {
+    return await this.commentRepository.isAuthor(userId, commentId)
+  }
 }

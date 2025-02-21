@@ -38,4 +38,18 @@ export class ChatRepositoryImpl implements ChatRepository {
       }
     })
   }
+
+  async isSender (userId: string, messageId: string): Promise<boolean> {
+    const message = await this.db.message.findUnique({
+      where: {
+        id: messageId
+      }
+    })
+
+    if (!message) {
+      return false
+    }
+
+    return message.senderId === userId
+  }
 }
