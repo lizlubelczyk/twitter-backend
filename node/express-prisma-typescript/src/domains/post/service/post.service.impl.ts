@@ -36,7 +36,7 @@ export class PostServiceImpl implements PostService {
       this.reactionRepository.getByTypeAndPostId(postId, 'like'),
       this.reactionRepository.getByTypeAndPostId(postId, 'retweet'),
       this.commentRepository.getByPostId(postId),
-      this.userRepository.getByIdExtended(post.authorId)
+      this.userRepository.getById(post.authorId)
     ])
 
     return {
@@ -48,9 +48,28 @@ export class PostServiceImpl implements PostService {
     }
   }
 
-  async getLatestPosts (userId: string, options: CursorPagination): Promise<PostDTO[]> {
+  async getLatestPosts (userId: string, options: CursorPagination): Promise<ExtendedPostDTO[]> {
     const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
-    return await this.repository.getAllByDatePaginatedAndFilter(options, followedUserIds)
+    const posts = await this.repository.getAllByDatePaginatedAndFilter(options, followedUserIds)
+
+    return await Promise.all(
+      posts.map(async (post) => {
+        const [likes, retweets, comments, author] = await Promise.all([
+          this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
+          this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
+          this.commentRepository.getByPostId(post.id),
+          this.userRepository.getById(post.authorId)
+        ])
+
+        return {
+          ...post,
+          likes,
+          retweets,
+          comments,
+          author
+        }
+      })
+    )
   }
 
   async getPostsByAuthor (userId: string, authorId: string): Promise<ExtendedPostDTO[]> {
@@ -62,7 +81,7 @@ export class PostServiceImpl implements PostService {
           this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
           this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
           this.commentRepository.getByPostId(post.id),
-          this.userRepository.getByIdExtended(post.authorId)
+          this.userRepository.getById(post.authorId)
         ])
 
         return {

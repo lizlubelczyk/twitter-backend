@@ -163,6 +163,9 @@ commentRouter.get('/:postId', async (req, res) => {
   const limitNumber = limit ? Number(limit) : undefined
   const afterString = after ? after.toString() : undefined
   const post = await postService.getPost(postId)
+  if (post.author === null) {
+    return res.status(404).json({ error: 'Post not found' })
+  }
   const isFollowing = await followerService.isFollowing(userId, post.author.id)
   const isPrivate = await userService.isPrivate(post.author.id)
   if (!isFollowing && userId !== post.author.id && isPrivate) {
