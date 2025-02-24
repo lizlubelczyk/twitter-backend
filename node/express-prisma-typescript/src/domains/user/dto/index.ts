@@ -25,31 +25,13 @@ export class ExtendedUserDTO extends UserDTO {
   password!: string
 }
 export class UserViewDTO {
-  constructor (user: UserViewDTO) {
-    this.id = user.id
-    this.name = user.name
-    this.username = user.username
-    this.profilePicture = user.profilePicture
-    this.private = user.private
-  }
-
-  id: string
-  name: string | null
-  username: string
-  profilePicture: string | null
-  private: boolean
-}
-
-export class UserProfileDTO {
-  constructor (
-    id: string,
+  constructor (id: string,
     name: string | null | undefined,
     username: string | undefined,
     profilePicture: string | null | undefined,
     isPrivate: false | true | undefined,
     followers: string[],
-    following: string[]
-  ) {
+    following: string[]) {
     this.id = id
     this.name = name
     this.username = username

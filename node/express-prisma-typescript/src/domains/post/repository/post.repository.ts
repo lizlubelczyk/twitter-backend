@@ -8,4 +8,5 @@ export interface PostRepository {
   getById: (postId: string) => Promise<PostDTO | null>
   getByAuthorId: (authorId: string) => Promise<PostDTO[]>
   getByIds: (postIds: string[]) => Promise<PostDTO[]>
+  getByUsers: (options: CursorPagination, users: string[]) => Promise<PostDTO[]>
 }
