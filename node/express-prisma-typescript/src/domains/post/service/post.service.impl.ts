@@ -95,8 +95,27 @@ export class PostServiceImpl implements PostService {
     )
   }
 
-  async getFollowingPosts (userId: string, options: CursorPagination): Promise<PostDTO[]> {
+  async getFollowingPosts(userId: string, options: CursorPagination): Promise<ExtendedPostDTO[]> {
     const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
-    return await this.repository.getByUsers(options, followedUserIds)
+    const posts = await this.repository.getByUsers(options, followedUserIds)
+
+    return await Promise.all(
+      posts.map(async (post) => {
+        const [likes, retweets, comments, author] = await Promise.all([
+          this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
+          this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
+          this.commentRepository.getByPostId(post.id),
+          this.userRepository.getById(post.authorId)
+        ])
+
+        return {
+          ...post,
+          likes,
+          retweets,
+          comments,
+          author
+        }
+      })
+    )
   }
 }
