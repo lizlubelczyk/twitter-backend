@@ -6,4 +6,5 @@ export interface PostService {
   getPost: (postId: string) => Promise<ExtendedPostDTO>
   getLatestPosts: (userId: string, options: { limit?: number, before?: string, after?: string }) => Promise<PostDTO[]>
   getPostsByAuthor: (userId: any, authorId: string) => Promise<ExtendedPostDTO[]>
+  getFollowingPosts: (userId: string, options: { limit?: number, before?: string, after?: string }) => Promise<PostDTO[]>
 }

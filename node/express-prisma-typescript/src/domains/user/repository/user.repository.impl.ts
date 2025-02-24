@@ -23,7 +23,7 @@ export class UserRepositoryImpl implements UserRepository {
         id: userId
       }
     })
-    return user ? new UserViewDTO(user) : null
+    return user ? new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], []) : null
   }
 
   async delete (userId: any): Promise<void> {
@@ -44,7 +44,7 @@ export class UserRepositoryImpl implements UserRepository {
         }
       ]
     })
-    return users.map(user => new UserViewDTO(user))
+    return users.map(user => new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], []))
   }
 
   async getByEmailOrUsername (email?: string, username?: string): Promise<ExtendedUserDTO | null> {
@@ -158,6 +158,6 @@ export class UserRepositoryImpl implements UserRepository {
         }
       ]
     })
-    return users.map(user => new UserViewDTO(user))
+    return users.map(user => new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], []))
   }
 }

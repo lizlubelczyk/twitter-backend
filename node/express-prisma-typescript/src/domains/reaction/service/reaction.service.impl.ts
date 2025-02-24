@@ -2,6 +2,7 @@ import { ReactionService } from '@domains/reaction/service/reaction.service'
 import { ReactionRepository } from '@domains/reaction/repository'
 import { PostRepository } from '@domains/post/repository'
 import { PostDTO } from '@domains/post/dto'
+import { ReactionDTO } from '@domains/reaction/dto'
 
 export class ReactionServiceImpl implements ReactionService {
   private readonly reactionRepository: ReactionRepository
@@ -27,5 +28,9 @@ export class ReactionServiceImpl implements ReactionService {
   async getByUserIdAndType (userId: string, type: string, limit?: number, after?: string): Promise<PostDTO[]> {
     const postIds = await this.reactionRepository.getByUserIdAndType(userId, type, limit, after)
     return await this.postRepository.getByIds(postIds)
+  }
+
+  async getByTypeAndPostId (postId: string, type: string): Promise<ReactionDTO[]> {
+    return await this.reactionRepository.getByTypeAndPostId(postId, type)
   }
 }

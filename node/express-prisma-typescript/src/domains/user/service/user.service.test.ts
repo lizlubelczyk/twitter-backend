@@ -32,8 +32,7 @@ describe('UserServiceImpl', () => {
   describe('getUser', () => {
     it('should return user when found', async () => {
       const user1: User = { id: 'user1', username: 'testuser', name: 'testuser', email: 'user1@gmail.com', private: false, profilePicture: 'http://example.com/pic.jpg', password: 'password', deletedAt: null, createdAt: new Date(), updatedAt: new Date() }
-      const user = new UserViewDTO(user1)
-
+      const user = new UserViewDTO(user1.id, user1.name, user1.username, user1.profilePicture, user1.private, [], [])
       mockUserRepository.getById.mockResolvedValueOnce(user)
 
       const result = await userService.getUser(user1.id)
@@ -60,8 +59,8 @@ describe('UserServiceImpl', () => {
       const user4: User = { id: 'user4', username: 'user4name', name: 'user4name', email: 'user4@gmail.com', private: false, profilePicture: 'http://example.com/pic.jpg', password: 'password', deletedAt: null, createdAt: new Date(), updatedAt: new Date() }
       const user5: User = { id: 'user5', username: 'user5name', name: 'user5name', email: 'user5@gmail.com', private: false, profilePicture: 'http://example.com/pic.jpg', password: 'password', deletedAt: null, createdAt: new Date(), updatedAt: new Date() }
       const recommendedUsers = [
-        new UserViewDTO(user4),
-        new UserViewDTO(user5)
+        new UserViewDTO(user4.id, user4.name, user4.username, user4.profilePicture, user4.private, [], []),
+        new UserViewDTO(user5.id, user5.name, user5.username, user5.profilePicture, user5.private, [], [])
       ]
 
       mockFollowerRepository.getFollowedUsersIds.mockResolvedValueOnce(followedUsers)
@@ -143,7 +142,7 @@ describe('UserServiceImpl', () => {
       const usernames = 'testuser'
       const options: OffsetPagination = { limit: 10, skip: 0 }
       const user1: User = { id: 'user1', username: 'testuser', name: 'testuser', email: 'user1@gmail.com', password: 'password', private: false, profilePicture: 'http://example.com/pic.jpg', deletedAt: null, createdAt: new Date(), updatedAt: new Date() }
-      const users = [new UserViewDTO(user1)]
+      const users = [new UserViewDTO(user1.id, user1.name, user1.username, user1.profilePicture, user1.private, [], [])]
 
       mockUserRepository.getUsersByUsername.mockResolvedValueOnce(users)
 

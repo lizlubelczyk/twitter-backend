@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { ReactionRepository } from '@domains/reaction/repository/reaction.repository'
+import { ReactionDTO } from '@domains/reaction/dto'
 
 export class ReactionRepositoryImpl implements ReactionRepository {
   constructor (private readonly db: PrismaClient) {}
@@ -66,5 +67,15 @@ export class ReactionRepositoryImpl implements ReactionRepository {
         type
       }
     })
+  }
+
+  async getByTypeAndPostId (postId: string, type: string): Promise<ReactionDTO[]> {
+    const reactions = await this.db.reaction.findMany({
+      where: {
+        postId,
+        type
+      }
+    })
+    return reactions.map(reaction => new ReactionDTO(reaction))
   }
 }

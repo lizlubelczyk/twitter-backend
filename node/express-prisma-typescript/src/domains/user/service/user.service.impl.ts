@@ -1,6 +1,6 @@
 import { NotFoundException } from '../../../utils/errors'
 import { OffsetPagination } from 'types'
-import { UserDTO, UserProfileDTO, UserViewDTO } from '../dto'
+import { UserDTO, UserViewDTO } from '../dto'
 import { UserRepository } from '../repository'
 import { UserService } from './user.service'
 import { FollowerRepository } from '../../follower/repository'
@@ -34,7 +34,7 @@ export class UserServiceImpl implements UserService {
       paginatedRecommendedUsersIds.map(async id => await this.repository.getById(id))
     )
 
-    return recommendedUsers.filter((user): user is UserViewDTO => user !== null).map(user => new UserViewDTO(user))
+    return recommendedUsers.filter((user): user is UserViewDTO => user !== null).map(user => new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], []))
   }
 
   async deleteUser (userId: any): Promise<void> {
@@ -58,10 +58,10 @@ export class UserServiceImpl implements UserService {
     return await this.repository.getUsersByUsername(usernames, options)
   }
 
-  async getProfile (userId: any): Promise<UserProfileDTO> {
+  async getProfile (userId: any): Promise<UserViewDTO> {
     const user = await this.repository.getById(userId)
     const followedUsersIds = await this.followerRepository.getFollowedUsersIds(userId)
     const followersIds = await this.followerRepository.getFollowersIds(userId)
-    return new UserProfileDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds)
+    return new UserViewDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds)
   }
 }

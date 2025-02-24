@@ -32,18 +32,18 @@ export class PostServiceImpl implements PostService {
     const post = await this.repository.getById(postId)
     if (!post) throw new NotFoundException('post')
 
-    const [likeCount, retweetCount, commentCount, author] = await Promise.all([
-      this.reactionRepository.countByPostIdAndType(postId, 'like'),
-      this.reactionRepository.countByPostIdAndType(postId, 'retweet'),
-      this.commentRepository.countByPostId(postId),
+    const [likes, retweets, comments, author] = await Promise.all([
+      this.reactionRepository.getByTypeAndPostId(postId, 'like'),
+      this.reactionRepository.getByTypeAndPostId(postId, 'retweet'),
+      this.commentRepository.getByPostId(postId),
       this.userRepository.getByIdExtended(post.authorId)
     ])
 
     return {
       ...post,
-      qtyComments: commentCount,
-      qtyLikes: likeCount,
-      qtyRetweets: retweetCount,
+      likes,
+      retweets,
+      comments,
       author
     }
   }
@@ -58,21 +58,26 @@ export class PostServiceImpl implements PostService {
 
     return await Promise.all(
       posts.map(async (post) => {
-        const [likeCount, retweetCount, commentCount, author] = await Promise.all([
-          this.reactionRepository.countByPostIdAndType(post.id, 'like'),
-          this.reactionRepository.countByPostIdAndType(post.id, 'retweet'),
-          this.commentRepository.countByPostId(post.id),
+        const [likes, retweets, comments, author] = await Promise.all([
+          this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
+          this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
+          this.commentRepository.getByPostId(post.id),
           this.userRepository.getByIdExtended(post.authorId)
         ])
 
         return {
           ...post,
-          qtyComments: commentCount,
-          qtyLikes: likeCount,
-          qtyRetweets: retweetCount,
+          likes,
+          retweets,
+          comments,
           author
         }
       })
     )
+  }
+
+  async getFollowingPosts (userId: string, options: CursorPagination): Promise<PostDTO[]> {
+    const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
+    return await this.repository.getByUsers(options, followedUserIds)
   }
 }

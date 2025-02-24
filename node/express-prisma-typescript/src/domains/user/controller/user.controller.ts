@@ -84,9 +84,8 @@ userRouter.get('/me', async (req: Request, res: Response) => {
  *       500:
  *         description: Internal server error
  */
-userRouter.get('/profile_picture', async (req: Request, res: Response) => {
+userRouter.get('/profile-picture', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-  console.log('userId', userId)
   try {
     const { uploadUrl, fileUrl } = await generateUploadUrl(userId)
     await service.setProfilePicture(userId, fileUrl)
@@ -99,7 +98,7 @@ userRouter.get('/profile_picture', async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /users/{userId}:
+ * /users/yUserId/{userId}:
  *   get:
  *     summary: Get a user by ID
  *     tags: [Users]
@@ -116,7 +115,7 @@ userRouter.get('/profile_picture', async (req: Request, res: Response) => {
  *       404:
  *         description: User not found
  */
-userRouter.get('/:userId', async (req: Request, res: Response) => {
+userRouter.get('/byUserId/:userId', async (req: Request, res: Response) => {
   const { userId: requesterId } = res.locals.context
   const { userId: targetUserId } = req.params
 
