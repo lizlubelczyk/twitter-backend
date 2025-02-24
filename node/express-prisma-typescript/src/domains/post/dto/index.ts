@@ -1,5 +1,5 @@
 import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
-import { ExtendedUserDTO } from '@domains/user/dto'
+import { ExtendedUserDTO, UserViewDTO } from '@domains/user/dto'
 import { CommentDTO } from '@domains/comment/dto'
 import { Reaction } from '@prisma/client'
 import { ReactionDTO } from '@domains/reaction/dto'
@@ -32,7 +32,7 @@ export class PostDTO {
 }
 
 export class ExtendedPostDTO extends PostDTO {
-  constructor (post: ExtendedPostDTO, author: ExtendedUserDTO, comments: CommentDTO[], likes: ReactionDTO[], retweets: ReactionDTO[]) {
+  constructor (post: ExtendedPostDTO, author: UserViewDTO, comments: CommentDTO[], likes: ReactionDTO[], retweets: ReactionDTO[]) {
     super(post)
     this.author = author
     this.comments = comments
@@ -40,7 +40,7 @@ export class ExtendedPostDTO extends PostDTO {
     this.retweets = retweets
   }
 
-  author: ExtendedUserDTO
+  author: UserViewDTO | null
   comments: CommentDTO[]
   likes: ReactionDTO[]
   retweets: ReactionDTO[]
