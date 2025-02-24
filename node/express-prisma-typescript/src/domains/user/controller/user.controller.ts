@@ -98,7 +98,7 @@ userRouter.get('/profile-picture', async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /users/yUserId/{userId}:
+ * /users/byUserId/{userId}:
  *   get:
  *     summary: Get a user by ID
  *     tags: [Users]
@@ -121,7 +121,7 @@ userRouter.get('/byUserId/:userId', async (req: Request, res: Response) => {
 
   try {
     const user = await service.getUser(targetUserId)
-    const isFollowing = await followerService.isFollowing(targetUserId, requesterId)
+    const isFollowing = await followerService.isFollowing(requesterId, targetUserId)
 
     return res.status(HttpStatus.OK).json({ user, isFollowing })
   } catch (error) {
