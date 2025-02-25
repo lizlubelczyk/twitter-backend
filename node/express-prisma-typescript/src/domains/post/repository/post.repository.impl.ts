@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-import { CursorPagination } from '@types'
+import { OffsetPagination } from '@types'
 
 import { PostRepository } from '.'
 import { CreatePostInputDTO, PostDTO } from '../dto'
@@ -18,7 +18,7 @@ export class PostRepositoryImpl implements PostRepository {
     return new PostDTO(post)
   }
 
-  async getAllByDatePaginatedAndFilter (options: CursorPagination, followedUserIds: string[]): Promise<PostDTO[]> {
+  async getAllByDatePaginatedAndFilter (options: OffsetPagination, followedUserIds: string[]): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
         OR: [
@@ -26,9 +26,8 @@ export class PostRepositoryImpl implements PostRepository {
           { author: { private: false } }
         ]
       },
-      cursor: options.after ? { id: options.after } : (options.before) ? { id: options.before } : undefined,
-      skip: options.after ?? options.before ? 1 : undefined,
-      take: options.limit ? (options.before ? -options.limit : options.limit) : undefined,
+      skip: options.skip,
+      take: options.limit,
       orderBy: [
         {
           createdAt: 'desc'
@@ -41,14 +40,13 @@ export class PostRepositoryImpl implements PostRepository {
     return posts.map(post => new PostDTO(post))
   }
 
-  async getByUsers (options: CursorPagination, users: string[]): Promise<PostDTO[]> {
+  async getByUsers (options: OffsetPagination, users: string[]): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
         authorId: { in: users }
       },
-      cursor: options.after ? { id: options.after } : (options.before) ? { id: options.before } : undefined,
-      skip: options.after ?? options.before ? 1 : undefined,
-      take: options.limit ? (options.before ? -options.limit : options.limit) : undefined,
+      skip: options.skip,
+      take: options.limit,
       orderBy: [
         {
           createdAt: 'desc'
@@ -78,11 +76,21 @@ export class PostRepositoryImpl implements PostRepository {
     return (post != null) ? new PostDTO(post) : null
   }
 
-  async getByAuthorId (authorId: string): Promise<PostDTO[]> {
+  async getByAuthorId (authorId: string, options: OffsetPagination): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
         authorId
-      }
+      },
+      skip: options.skip,
+      take: options.limit,
+      orderBy: [
+        {
+          createdAt: 'desc'
+        },
+        {
+          id: 'asc'
+        }
+      ]
     })
     return posts.map(post => new PostDTO(post))
   }

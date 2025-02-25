@@ -1,4 +1,4 @@
-import { CursorPagination } from '@types'
+import { CursorPagination, OffsetPagination } from '@types'
 import { CreatePostInputDTO, PostDTO } from '../dto'
 
 export interface PostRepository {
@@ -6,7 +6,7 @@ export interface PostRepository {
   getAllByDatePaginatedAndFilter: (options: CursorPagination, followedUserIds: string[]) => Promise<PostDTO[]>
   delete: (postId: string) => Promise<void>
   getById: (postId: string) => Promise<PostDTO | null>
-  getByAuthorId: (authorId: string) => Promise<PostDTO[]>
+  getByAuthorId: (authorId: string, options: OffsetPagination) => Promise<PostDTO[]>
   getByIds: (postIds: string[]) => Promise<PostDTO[]>
-  getByUsers: (options: CursorPagination, users: string[]) => Promise<PostDTO[]>
+  getByUsers: (options: OffsetPagination, users: string[]) => Promise<PostDTO[]>
 }

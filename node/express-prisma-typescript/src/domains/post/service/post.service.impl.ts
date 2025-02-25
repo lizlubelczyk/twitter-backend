@@ -2,7 +2,7 @@ import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
 import { validate } from 'class-validator'
-import { CursorPagination } from '@types'
+import { CursorPagination, OffsetPagination } from '@types'
 import { UserRepository } from '../../user/repository'
 import { ReactionRepository } from '../../reaction/repository'
 import { CommentRepository } from '../../comment/repository'
@@ -48,7 +48,7 @@ export class PostServiceImpl implements PostService {
     }
   }
 
-  async getLatestPosts (userId: string, options: CursorPagination): Promise<ExtendedPostDTO[]> {
+  async getLatestPosts (userId: string, options: OffsetPagination): Promise<ExtendedPostDTO[]> {
     const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
     const posts = await this.repository.getAllByDatePaginatedAndFilter(options, followedUserIds)
 
@@ -72,8 +72,8 @@ export class PostServiceImpl implements PostService {
     )
   }
 
-  async getPostsByAuthor (userId: string, authorId: string): Promise<ExtendedPostDTO[]> {
-    const posts = await this.repository.getByAuthorId(authorId)
+  async getPostsByAuthor (userId: string, authorId: string, options: OffsetPagination): Promise<ExtendedPostDTO[]> {
+    const posts = await this.repository.getByAuthorId(authorId, options)
 
     return await Promise.all(
       posts.map(async (post) => {
@@ -95,7 +95,7 @@ export class PostServiceImpl implements PostService {
     )
   }
 
-  async getFollowingPosts(userId: string, options: CursorPagination): Promise<ExtendedPostDTO[]> {
+  async getFollowingPosts (userId: string, options: OffsetPagination): Promise<ExtendedPostDTO[]> {
     const followedUserIds = await this.userRepository.getFollowedUsersIds(userId)
     const posts = await this.repository.getByUsers(options, followedUserIds)
 
