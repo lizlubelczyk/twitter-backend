@@ -57,8 +57,8 @@ const userService: UserService = new UserServiceImpl(new UserRepositoryImpl(db),
  */
 postRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-  const { limit, skip } = req.query as Record<string, string>
-
+  const limit = Number(req.query.limit) || 10
+  const skip = Number(req.query.skip) || 0
   const posts = await service.getLatestPosts(userId, { limit: Number(limit), skip: Number(skip) })
 
   return res.status(HttpStatus.OK).json(posts)
@@ -66,8 +66,8 @@ postRouter.get('/', async (req: Request, res: Response) => {
 
 postRouter.get('/following', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-  const { limit, skip } = req.query as Record<string, string>
-
+  const limit = Number(req.query.limit) || 10
+  const skip = Number(req.query.skip) || 0
   const posts = await service.getFollowingPosts(userId, { limit: Number(limit), skip: Number(skip) })
 
   return res.status(HttpStatus.OK).json(posts)
@@ -130,7 +130,8 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
 postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { userId: authorId } = req.params
-  const { limit, skip } = req.query as Record<string, string>
+  const limit = Number(req.query.limit) || 10
+  const skip = Number(req.query.skip) || 0
   const isFollowing = await followService.isFollowing(userId, authorId)
   const isPrivate = await userService.isPrivate(authorId)
 
