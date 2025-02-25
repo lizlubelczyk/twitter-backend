@@ -57,18 +57,18 @@ const userService: UserService = new UserServiceImpl(new UserRepositoryImpl(db),
  */
 postRouter.get('/', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-  const { limit, before, after } = req.query as Record<string, string>
+  const { limit, skip } = req.query as Record<string, string>
 
-  const posts = await service.getLatestPosts(userId, { limit: Number(limit), before, after })
+  const posts = await service.getLatestPosts(userId, { limit: Number(limit), skip: Number(skip) })
 
   return res.status(HttpStatus.OK).json(posts)
 })
 
 postRouter.get('/following', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
-  const { limit, before, after } = req.query as Record<string, string>
+  const { limit, skip } = req.query as Record<string, string>
 
-  const posts = await service.getFollowingPosts(userId, { limit: Number(limit), before, after })
+  const posts = await service.getFollowingPosts(userId, { limit: Number(limit), skip: Number(skip) })
 
   return res.status(HttpStatus.OK).json(posts)
 })
@@ -130,6 +130,7 @@ postRouter.get('/:postId', async (req: Request, res: Response) => {
 postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   const { userId: authorId } = req.params
+  const { limit, skip } = req.query as Record<string, string>
   const isFollowing = await followService.isFollowing(userId, authorId)
   const isPrivate = await userService.isPrivate(authorId)
 
@@ -137,7 +138,7 @@ postRouter.get('/by_user/:userId', async (req: Request, res: Response) => {
     return res.status(HttpStatus.NOT_FOUND).send('You are not following this user')
   }
 
-  const posts = await service.getPostsByAuthor(userId, authorId)
+  const posts = await service.getPostsByAuthor(userId, authorId, { limit: Number(limit), skip: Number(skip) })
 
   return res.status(HttpStatus.OK).json(posts)
 })
