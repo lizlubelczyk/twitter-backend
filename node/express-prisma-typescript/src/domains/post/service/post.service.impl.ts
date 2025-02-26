@@ -2,22 +2,26 @@ import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
 import { validate } from 'class-validator'
-import { CursorPagination, OffsetPagination } from '@types'
+import { OffsetPagination } from '@types'
 import { UserRepository } from '../../user/repository'
 import { ReactionRepository } from '../../reaction/repository'
-import { CommentRepository } from '../../comment/repository'
 import { ForbiddenException, NotFoundException } from '../../../utils'
+import { CommentService } from '@domains/comment/service'
+import { CommentDTO } from '@domains/comment/dto'
 
 export class PostServiceImpl implements PostService {
   constructor (
     private readonly repository: PostRepository,
     private readonly userRepository: UserRepository,
     private readonly reactionRepository: ReactionRepository,
-    private readonly commentRepository: CommentRepository
+    private readonly commentService: CommentService
   ) {}
 
-  async createPost (userId: string, data: CreatePostInputDTO): Promise<PostDTO> {
+  async createPost (userId: string, data: CreatePostInputDTO, parentId?: string): Promise<PostDTO | CommentDTO> {
     await validate(data)
+    if (parentId) {
+      return await this.commentService.create(userId, parentId, data)
+    }
     return await this.repository.create(userId, data)
   }
 
@@ -35,7 +39,7 @@ export class PostServiceImpl implements PostService {
     const [likes, retweets, comments, author] = await Promise.all([
       this.reactionRepository.getByTypeAndPostId(postId, 'like'),
       this.reactionRepository.getByTypeAndPostId(postId, 'retweet'),
-      this.commentRepository.getByPostId(postId),
+      this.commentService.getByPostId(postId),
       this.userRepository.getById(post.authorId)
     ])
 
@@ -57,7 +61,7 @@ export class PostServiceImpl implements PostService {
         const [likes, retweets, comments, author] = await Promise.all([
           this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
           this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
-          this.commentRepository.getByPostId(post.id),
+          this.commentService.getByPostId(post.id),
           this.userRepository.getById(post.authorId)
         ])
 
@@ -80,7 +84,7 @@ export class PostServiceImpl implements PostService {
         const [likes, retweets, comments, author] = await Promise.all([
           this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
           this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
-          this.commentRepository.getByPostId(post.id),
+          this.commentService.getByPostId(post.id),
           this.userRepository.getById(post.authorId)
         ])
 
@@ -104,7 +108,7 @@ export class PostServiceImpl implements PostService {
         const [likes, retweets, comments, author] = await Promise.all([
           this.reactionRepository.getByTypeAndPostId(post.id, 'like'),
           this.reactionRepository.getByTypeAndPostId(post.id, 'retweet'),
-          this.commentRepository.getByPostId(post.id),
+          this.commentService.getByPostId(post.id),
           this.userRepository.getById(post.authorId)
         ])
 

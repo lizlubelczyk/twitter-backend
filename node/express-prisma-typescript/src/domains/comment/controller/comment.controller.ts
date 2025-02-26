@@ -13,9 +13,9 @@ import { UserServiceImpl } from '@domains/user/service'
 
 export const commentRouter = Router()
 
-const service: CommentService = new CommentServiceImpl(new CommentRepositoryImpl(db))
+const service: CommentService = new CommentServiceImpl(new CommentRepositoryImpl(db), new UserRepositoryImpl(db), new ReactionRepositoryImpl(db))
 const followerService = new FollowerServiceImpl(new FollowerRepositoryImpl(db))
-const postService = new PostServiceImpl(new PostRepositoryImpl(db), new UserRepositoryImpl(db), new ReactionRepositoryImpl(db), new CommentRepositoryImpl(db))
+const postService = new PostServiceImpl(new PostRepositoryImpl(db), new UserRepositoryImpl(db), new ReactionRepositoryImpl(db), new CommentServiceImpl(new CommentRepositoryImpl(db), new UserRepositoryImpl(db), new ReactionRepositoryImpl(db)))
 const userService = new UserServiceImpl(new UserRepositoryImpl(db), new FollowerRepositoryImpl(db))
 /**
  * @swagger

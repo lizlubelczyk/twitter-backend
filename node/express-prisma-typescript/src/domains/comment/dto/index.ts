@@ -1,21 +1,30 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
+import { UserViewDTO } from '@domains/user/dto'
+import { ReactionDTO } from '@domains/reaction/dto'
+import { Post } from '@prisma/client'
 
 export class CommentDTO {
-  constructor (post: CommentDTO) {
+  constructor (post: Post, author: UserViewDTO, comments: CommentDTO[], likes: ReactionDTO[], retweets: ReactionDTO[]) {
     this.id = post.id
-    this.authorId = post.authorId
+    this.author = author
     this.content = post.content
     this.images = post.images
     this.createdAt = post.createdAt
     this.parentId = post.parentId
+    this.comments = comments
+    this.likes = likes
+    this.retweets = retweets
   }
 
   id: string
-  authorId: string
+  author: UserViewDTO | null
   content: string
   images: string[]
   createdAt: Date
   parentId: string | null
+  comments: CommentDTO[]
+  likes: ReactionDTO[]
+  retweets: ReactionDTO[]
 }
 
 export class CreateCommentInputDTO {
