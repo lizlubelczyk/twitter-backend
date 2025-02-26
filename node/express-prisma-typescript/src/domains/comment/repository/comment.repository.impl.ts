@@ -1,11 +1,11 @@
-import { CommentDTO, CreateCommentInputDTO } from '../dto'
-import { PrismaClient } from '@prisma/client'
+import { CreateCommentInputDTO } from '../dto'
+import { Post, PrismaClient } from '@prisma/client'
 import { CommentRepository } from './comment.repository'
 
 export class CommentRepositoryImpl implements CommentRepository {
   constructor (private readonly db: PrismaClient) {}
 
-  async create (userId: string, postId: string, data: CreateCommentInputDTO): Promise<CommentDTO> {
+  async create (userId: string, postId: string, data: CreateCommentInputDTO): Promise<Post> {
     const comment = await this.db.post.create({
       data: {
         authorId: userId,
@@ -13,7 +13,7 @@ export class CommentRepositoryImpl implements CommentRepository {
         ...data
       }
     })
-    return new CommentDTO(comment)
+    return comment
   }
 
   async delete (commentId: string): Promise<void> {
@@ -24,7 +24,7 @@ export class CommentRepositoryImpl implements CommentRepository {
     })
   }
 
-  async getByPostId (postId: string, limit?: number, after?: string): Promise<CommentDTO[]> {
+  async getByPostId (postId: string, limit?: number, after?: string): Promise<Post[]> {
     const comments = await this.db.post.findMany({
       where: {
         parentId: postId
@@ -40,18 +40,18 @@ export class CommentRepositoryImpl implements CommentRepository {
         createdAt: 'desc'
       }
     })
-    return comments.map(comment => new CommentDTO(comment))
+    return comments
   }
 
   async isComment (commentId: string): Promise<boolean> {
-    return await this.db.post.findUnique({
+    return (await this.db.post.findUnique({
       where: {
         id: commentId
       }
-    }) != null
+    })) != null
   }
 
-  async getByUserId (userId: string, limit?: number, after?: string): Promise<CommentDTO[]> {
+  async getByUserId (userId: string, limit?: number, after?: string): Promise<Post[]> {
     const comments = await this.db.post.findMany({
       where: {
         authorId: userId
@@ -67,7 +67,7 @@ export class CommentRepositoryImpl implements CommentRepository {
         createdAt: 'desc'
       }
     })
-    return comments.map(comment => new CommentDTO(comment))
+    return comments
   }
 
   async countByPostId (postId: string): Promise<number> {

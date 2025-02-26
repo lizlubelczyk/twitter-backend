@@ -21,6 +21,7 @@ export class PostRepositoryImpl implements PostRepository {
   async getAllByDatePaginatedAndFilter (options: OffsetPagination, followedUserIds: string[]): Promise<PostDTO[]> {
     const posts = await this.db.post.findMany({
       where: {
+        parentId: null,
         OR: [
           { authorId: { in: followedUserIds } },
           { author: { private: false } }
