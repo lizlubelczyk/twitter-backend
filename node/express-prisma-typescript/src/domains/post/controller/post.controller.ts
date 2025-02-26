@@ -14,7 +14,7 @@ import { FollowerService, FollowerServiceImpl } from '@domains/follower/service'
 import { UserService, UserServiceImpl } from '@domains/user/service'
 import { CommentRepositoryImpl } from '@domains/comment/repository'
 import { ReactionRepositoryImpl } from '@domains/reaction/repository'
-import { CommentServiceImpl } from '@domains/comment/service'
+import { CommentServiceImpl } from '../../comment/service'
 
 export const postRouter = Router()
 
