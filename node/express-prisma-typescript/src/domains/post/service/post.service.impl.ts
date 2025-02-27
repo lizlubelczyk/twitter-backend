@@ -17,12 +17,23 @@ export class PostServiceImpl implements PostService {
     private readonly commentService: CommentService
   ) {}
 
-  async createPost (userId: string, data: CreatePostInputDTO, parentId?: string): Promise<PostDTO | CommentDTO> {
+  async createPost (userId: string, data: CreatePostInputDTO, parentId?: string): Promise<ExtendedPostDTO | CommentDTO> {
     await validate(data)
     if (parentId) {
       return await this.commentService.create(userId, parentId, data)
     }
-    return await this.repository.create(userId, data)
+    const post = await this.repository.create(userId, data)
+    const author = await this.userRepository.getById(post.authorId)
+    const likes = await this.reactionRepository.getByTypeAndPostId(post.id, 'like')
+    const retweets = await this.reactionRepository.getByTypeAndPostId(post.id, 'retweet')
+    const comments = await this.commentService.getByPostId(post.id)
+    return {
+      ...post,
+      author,
+      likes,
+      retweets,
+      comments
+    }
   }
 
   async deletePost (userId: string, postId: string): Promise<void> {
