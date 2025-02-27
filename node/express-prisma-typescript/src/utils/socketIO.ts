@@ -81,7 +81,7 @@ export const setupIO = (server: httpServer): void => {
       console.log('bring room', userId, receiverId)
       const room = [userId, receiverId].sort().join('_')
       const messages = await chatService.getMessages(userId, receiverId)
-      messages.map(msg => io.to(room).emit('chat message', msg.content, msg.createdAt))
+      messages.map(msg => io.to(room).emit('chat message', msg.content, msg.createdAt, msg.senderId))
       console.log(messages)
     })
 
