@@ -1,4 +1,4 @@
-import { CreatePostInputDTO, ExtendedPostDTO, PostDTO } from '../dto'
+import { CreatePostInputDTO, ExtendedPostDTO } from '../dto'
 import { PostRepository } from '../repository'
 import { PostService } from '.'
 import { validate } from 'class-validator'
@@ -8,6 +8,7 @@ import { ReactionRepository } from '../../reaction/repository'
 import { ForbiddenException, NotFoundException } from '../../../utils'
 import { CommentService } from '@domains/comment/service'
 import { CommentDTO } from '@domains/comment/dto'
+import { generateUploadUrl } from '@utils/s3Service'
 
 export class PostServiceImpl implements PostService {
   constructor (
@@ -17,22 +18,42 @@ export class PostServiceImpl implements PostService {
     private readonly commentService: CommentService
   ) {}
 
-  async createPost (userId: string, data: CreatePostInputDTO, parentId?: string): Promise<ExtendedPostDTO | CommentDTO> {
+  async createPost (userId: string, data: CreatePostInputDTO, parentId?: string): Promise<{ post: ExtendedPostDTO | CommentDTO, imageUploadUrls: string[] }> {
     await validate(data)
     if (parentId) {
-      return await this.commentService.create(userId, parentId, data)
+      const comment = await this.commentService.create(userId, parentId, data)
+      return { post: comment, imageUploadUrls: [] }
     }
+
     const post = await this.repository.create(userId, data)
     const author = await this.userRepository.getById(post.authorId)
     const likes = await this.reactionRepository.getByTypeAndPostId(post.id, 'like')
     const retweets = await this.reactionRepository.getByTypeAndPostId(post.id, 'retweet')
     const comments = await this.commentService.getByPostId(post.id)
-    return {
+    console.log('data.images', data.images)
+
+    const imageUploadUrls = await Promise.all(
+      (data.images ?? []).map(async (image) => {
+        const folder = `${userId}/posts/${post.id}/${image}`
+        const { uploadUrl, fileUrl } = await generateUploadUrl(folder)
+        return { uploadUrl, fileUrl }
+      })
+    )
+
+    post.images = imageUploadUrls.map(url => url.fileUrl)
+    await this.repository.update(post.id, post)
+
+    const extendedPost: ExtendedPostDTO = {
       ...post,
       author,
       likes,
       retweets,
       comments
+    }
+
+    return {
+      post: extendedPost,
+      imageUploadUrls: imageUploadUrls.map(url => url.uploadUrl)
     }
   }
 

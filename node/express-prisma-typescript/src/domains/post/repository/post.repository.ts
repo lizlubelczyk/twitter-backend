@@ -9,4 +9,5 @@ export interface PostRepository {
   getByAuthorId: (authorId: string, options: OffsetPagination) => Promise<PostDTO[]>
   getByIds: (postIds: string[]) => Promise<PostDTO[]>
   getByUsers: (options: OffsetPagination, users: string[]) => Promise<PostDTO[]>
+  update: (postId: string, data: Partial<PostDTO>) => Promise<PostDTO>
 }

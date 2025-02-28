@@ -1,7 +1,6 @@
 import { ArrayMaxSize, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
-import { ExtendedUserDTO, UserViewDTO } from '@domains/user/dto'
+import { UserViewDTO } from '@domains/user/dto'
 import { CommentDTO } from '@domains/comment/dto'
-import { Reaction } from '@prisma/client'
 import { ReactionDTO } from '@domains/reaction/dto'
 
 export class CreatePostInputDTO {

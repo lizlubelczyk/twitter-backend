@@ -87,7 +87,8 @@ userRouter.get('/me', async (req: Request, res: Response) => {
 userRouter.get('/profile-picture', async (req: Request, res: Response) => {
   const { userId } = res.locals.context
   try {
-    const { uploadUrl, fileUrl } = await generateUploadUrl(userId)
+    const folder = `${userId.toString()}/profile`
+    const { uploadUrl, fileUrl } = await generateUploadUrl(folder)
     await service.setProfilePicture(userId, fileUrl)
     return res.status(HttpStatus.OK).json({ uploadUrl })
   } catch (e) {

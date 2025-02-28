@@ -104,4 +104,14 @@ export class PostRepositoryImpl implements PostRepository {
     })
     return posts.map(post => new PostDTO(post))
   }
+
+  async update (postId: string, data: Partial<PostDTO>): Promise<PostDTO> {
+    const post = await this.db.post.update({
+      where: {
+        id: postId
+      },
+      data
+    })
+    return new PostDTO(post)
+  }
 }
