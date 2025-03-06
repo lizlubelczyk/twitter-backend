@@ -22,7 +22,7 @@ export const setupIO = (server: httpServer): void => {
   io.use(authenticateSocket)
 
   io.on('connection', (socket) => {
-    const userId = socket.data.user
+    const userId: string = socket.data.user
     console.log('a user connected:', userId)
 
     socket.on('join room', async ({ receiverId }: { receiverId: string }) => {
@@ -47,7 +47,7 @@ export const setupIO = (server: httpServer): void => {
       await socket.leave(room)
     })
 
-    socket.on('chat message', async ({ msg, receiverId }: { msg: string, receiverId: string }) => {
+    socket.on('send message', async ({ msg, receiverId }: { msg: string, receiverId: string }) => {
       console.log('senderId:', userId, 'receiverId:', receiverId)
       console.log('message:', msg)
 
@@ -57,8 +57,12 @@ export const setupIO = (server: httpServer): void => {
       }
 
       const room = [userId, receiverId].sort().join('_')
-      const roomData = io.sockets.adapter.rooms.get(room)
+      const roomData: Set<string> | undefined = io.sockets.adapter.rooms.get(room)
 
+      if (!roomData) {
+        console.error(`Room ${room} does not exist, message rejected.`)
+        return
+      }
       if (!roomData?.has(socket.id)) {
         console.error(`User ${userId} is not in room ${room}, message rejected.`)
         return
@@ -67,7 +71,7 @@ export const setupIO = (server: httpServer): void => {
       if (await followerService.isFollowing(userId, receiverId) && await followerService.isFollowing(receiverId, userId)) {
         try {
           const message = await chatService.saveMessage(userId, receiverId, msg)
-          io.to(room).emit('chat message', msg, message.createdAt)
+          io.to(room).emit('get message', { msg, createdAt: message.createdAt, senderId: userId })
         } catch (e) {
           console.error('Error saving message:', e)
           throw new ConflictException()
@@ -81,7 +85,7 @@ export const setupIO = (server: httpServer): void => {
       console.log('bring room', userId, receiverId)
       const room = [userId, receiverId].sort().join('_')
       const messages = await chatService.getMessages(userId, receiverId)
-      messages.map(msg => io.to(room).emit('chat message', msg.content, msg.createdAt, msg.senderId))
+      messages.map(msg => io.to(room).emit('get message', { msg: msg.content, createdAt: msg.createdAt, senderId: msg.senderId }))
       console.log(messages)
     })
 
