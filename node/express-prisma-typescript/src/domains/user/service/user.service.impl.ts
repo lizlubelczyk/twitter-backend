@@ -34,7 +34,7 @@ export class UserServiceImpl implements UserService {
       paginatedRecommendedUsersIds.map(async id => await this.repository.getById(id))
     )
 
-    return recommendedUsers.filter((user): user is UserViewDTO => user !== null).map(user => new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], []))
+    return recommendedUsers.filter((user): user is UserViewDTO => user !== null).map(user => new UserViewDTO(user.id, user.name, user.username, user.profilePicture, user.private, [], [], false, false))
   }
 
   async deleteUser (userId: any): Promise<void> {
@@ -58,10 +58,12 @@ export class UserServiceImpl implements UserService {
     return await this.repository.getUsersByUsername(usernames, options)
   }
 
-  async getProfile (userId: any): Promise<UserViewDTO> {
-    const user = await this.repository.getById(userId)
-    const followedUsersIds = await this.followerRepository.getFollowedUsersIds(userId)
-    const followersIds = await this.followerRepository.getFollowersIds(userId)
-    return new UserViewDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds)
+  async getProfile (id: any, userId: any): Promise<UserViewDTO> {
+    const user = await this.repository.getById(id)
+    const followedUsersIds = await this.followerRepository.getFollowedUsersIds(id)
+    const followersIds = await this.followerRepository.getFollowersIds(id)
+    const isFollowing = followersIds.includes(userId)
+    const isFollowed = followedUsersIds.includes(userId)
+    return new UserViewDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds, isFollowing, isFollowed)
   }
 }
