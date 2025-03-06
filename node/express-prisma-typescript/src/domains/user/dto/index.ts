@@ -31,7 +31,7 @@ export class UserViewDTO {
     profilePicture: string | null | undefined,
     isPrivate: false | true | undefined,
     followers: string[],
-    following: string[]) {
+    following: string[], isFollowing: boolean, isFollowed: boolean) {
     this.id = id
     this.name = name
     this.username = username
@@ -39,6 +39,8 @@ export class UserViewDTO {
     this.private = isPrivate
     this.followers = followers
     this.following = following
+    this.isFollowing = isFollowing
+    this.isFollowed = isFollowed
   }
 
   id: string
@@ -48,4 +50,6 @@ export class UserViewDTO {
   private: false | true | undefined
   followers: string[]
   following: string[]
+  isFollowing: boolean
+  isFollowed: boolean
 }

@@ -222,9 +222,10 @@ userRouter.get('/by_username/:username', async (req: Request, res: Response) => 
  *         description: User not found
  */
 
-userRouter.get('/profile/:userId', async (req: Request, res: Response) => {
-  const { userId } = req.params
-  const user = await service.getProfile(userId)
+userRouter.get('/profile/:id', async (req: Request, res: Response) => {
+  const { id } = req.params
+  const { userId } = res.locals.context
+  const user = await service.getProfile(id, userId)
   return res.status(HttpStatus.OK).json(user)
 })
 

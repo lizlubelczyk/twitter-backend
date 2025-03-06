@@ -9,5 +9,5 @@ export interface UserService {
   isPrivate: (userId: any) => Promise<boolean>
   setProfilePicture: (userId: any, pictureUrl: string) => Promise<UserDTO>
   getUsersByUsername: (usernames: string, options: OffsetPagination) => Promise<UserViewDTO[]>
-  getProfile: (userId: any) => Promise<UserViewDTO>
+  getProfile: (id: any, userId: any) => Promise<UserViewDTO>
 }
