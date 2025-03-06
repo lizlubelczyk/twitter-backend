@@ -64,6 +64,6 @@ export class UserServiceImpl implements UserService {
     const followersIds = await this.followerRepository.getFollowersIds(id)
     const isFollowing = followersIds.includes(userId)
     const isFollowed = followedUsersIds.includes(userId)
-    return new UserViewDTO(userId, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds, isFollowing, isFollowed)
+    return new UserViewDTO(id, user?.name, user?.username, user?.profilePicture, user?.private, followersIds, followedUsersIds, isFollowing, isFollowed)
   }
 }
